@@ -4,6 +4,9 @@ from game.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, F
 
 from game.components.spaceship import SpaceShip
 
+
+
+
 # Game tiene un "Spaceship" - Por lo general esto es iniciliazar un objeto Spaceship en el __init__
 class Game:
     def __init__(self):
@@ -19,6 +22,13 @@ class Game:
 
         # Game tiene un "Spaceship"
         self.spaceship = SpaceShip()
+        self.move_left = False
+        self.move_right = False
+        self.spaceship_speed = 5
+
+        
+
+        
 
 
 
@@ -29,19 +39,57 @@ class Game:
         # while self.playing == True
         while self.playing: # Mientras el atributo playing (self.playing) sea true "repito"
             self.handle_events()
+            self.spaceship_movements()
             self.update()
             self.draw()
+            #self.spaceship_movements()
+            
         else:
             print("Something ocurred to quit the game!!!")
         pygame.display.quit()
         pygame.quit()
 
     def handle_events(self):
+        
         # Para un "event" (es un elemento) en la lista (secuencia) que me retorna el metodo get()
         for event in pygame.event.get():
             # si el "event" type es igual a pygame.QUIT entonces cambiamos playing a False
             if event.type == pygame.QUIT:
                 self.playing = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    self.move_left = True
+                elif event.key == pygame.K_RIGHT:
+                    self.move_right = True
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT:
+                    self.move_left = False
+                elif event.key == pygame.K_RIGHT:
+                    self.move_right = False
+
+        
+        print( self.move_right)
+
+    def spaceship_movements(self):
+        if self.move_left and self.spaceship.image_rect.left > 0:
+            self.spaceship.image_rect.x -= self.spaceship_speed
+        if self.move_right and self.spaceship.image_rect.right < SCREEN_WIDTH:
+            self.spaceship.image_rect.x += self.spaceship_speed
+        if self.spaceship.image_rect.left <= 0:
+            self.spaceship.image_rect.right = SCREEN_WIDTH
+        elif self.spaceship.image_rect.right >= SCREEN_WIDTH:
+            self.spaceship.image_rect.left = 0 
+
+        
+    
+
+        # spaceship movements
+        
+        
+            
+                
+
+
 
     def update(self):
         # pass
