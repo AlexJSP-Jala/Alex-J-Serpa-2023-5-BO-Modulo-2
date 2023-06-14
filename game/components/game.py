@@ -22,15 +22,6 @@ class Game:
 
         # Game tiene un "Spaceship"
         self.spaceship = SpaceShip()
-        self.move_left = False
-        self.move_right = False
-        self.spaceship_speed = 5
-
-        
-
-        
-
-
 
     def run(self):
         # Game loop: events - update - draw
@@ -39,7 +30,6 @@ class Game:
         # while self.playing == True
         while self.playing: # Mientras el atributo playing (self.playing) sea true "repito"
             self.handle_events()
-            self.spaceship_movements()
             self.update()
             self.draw()
             #self.spaceship_movements()
@@ -58,38 +48,15 @@ class Game:
                 self.playing = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    self.move_left = True
+                    self.spaceship.move_left = True
                 elif event.key == pygame.K_RIGHT:
-                    self.move_right = True
+                    self.spaceship.move_right = True
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
-                    self.move_left = False
+                    self.spaceship.move_left = False
                 elif event.key == pygame.K_RIGHT:
-                    self.move_right = False
-
+                    self.spaceship.move_right = False
         
-        print( self.move_right)
-
-    def spaceship_movements(self):
-        if self.move_left and self.spaceship.image_rect.left > 0:
-            self.spaceship.image_rect.x -= self.spaceship_speed
-        if self.move_right and self.spaceship.image_rect.right < SCREEN_WIDTH:
-            self.spaceship.image_rect.x += self.spaceship_speed
-        if self.spaceship.image_rect.left <= 0:
-            self.spaceship.image_rect.right = SCREEN_WIDTH
-        elif self.spaceship.image_rect.right >= SCREEN_WIDTH:
-            self.spaceship.image_rect.left = 0 
-
-        
-    
-
-        # spaceship movements
-        
-        
-            
-                
-
-
 
     def update(self):
         # pass
