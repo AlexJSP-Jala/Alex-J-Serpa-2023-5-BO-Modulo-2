@@ -2,7 +2,7 @@ import pygame
 
 from game.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, DEFAULT_TYPE
 
-from game.components.spaceship import SpaceShip
+from game.components.spaceship import SpaceShip, Enemy
 
 
 
@@ -22,6 +22,8 @@ class Game:
 
         # Game tiene un "Spaceship"
         self.spaceship = SpaceShip()
+        #Game has a enemy 
+        self.enemy = Enemy(500, 50)
 
     def run(self):
         # Game loop: events - update - draw
@@ -51,16 +53,25 @@ class Game:
                     self.spaceship.move_left = True
                 elif event.key == pygame.K_RIGHT:
                     self.spaceship.move_right = True
+                elif event.key == pygame.K_UP:  # Nueva tecla agregada: flecha hacia arriba
+                    self.spaceship.move_up = True
+                elif event.key == pygame.K_DOWN:  # Nueva tecla agregada: flecha hacia abajo
+                    self.spaceship.move_down = True
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
                     self.spaceship.move_left = False
                 elif event.key == pygame.K_RIGHT:
                     self.spaceship.move_right = False
+                elif event.key == pygame.K_UP:  # Nueva tecla agregada: flecha hacia arriba
+                    self.spaceship.move_up = False
+                elif event.key == pygame.K_DOWN:  # Nueva tecla agregada: flecha hacia abajo
+                    self.spaceship.move_down = False
         
 
     def update(self):
         # pass
         self.spaceship.update()
+        self.enemy.update()
 
     def draw(self):
         self.clock.tick(FPS)
@@ -69,7 +80,9 @@ class Game:
 
 
         # dibujamos el objeto en pantalla
-        self.screen.blit(self.spaceship.image, self.spaceship.image_rect)
+        self.screen.blit(self.spaceship.image, (self.spaceship.image_rect.x, self.spaceship.image_rect.y))
+        # display the enemy spaceship in its current position 
+        self.screen.blit(self.enemy.image, self.enemy.image_rect)
 
         pygame.display.update()
         pygame.display.flip()
