@@ -1,11 +1,12 @@
 import pygame
 from pygame.sprite import Sprite
 
-from game.utils.constants import SPACESHIP, SCREEN_WIDTH, ENEMY_1, SCREEN_HEIGHT
+from game.utils.constants import SPACESHIP, SCREEN_WIDTH, SCREEN_HEIGHT
 
 # casi Todo en pygame es un objeto
 # Un personaje en mi juego es un objeto (instancia de algo)
 # La nave (spaceship) es un personaje => necesito una clase
+
 
 
 # SpaceShip es una clase derivada (hija) de Sprite
@@ -40,26 +41,6 @@ class SpaceShip(Sprite):
         elif self.image_rect.right >= SCREEN_WIDTH:
             self.image_rect.left = 0
 
-class Enemy(Sprite):
 
-    def __init__(self, x_position, y_position):
-        self.x_position = x_position
-        self.y_position = y_position
-        self.image_size = (40, 60)
-        self.image = pygame.transform.scale(ENEMY_1, self.image_size)
-        self.image_rect = self.image.get_rect()
-        self.image_rect.x = x_position
-        self.image_rect.y = y_position
-        self.move_left = False
-        self.move_right = False
-        # Enemy ship movement configuration
-        self.spaceship_enemy_speed = 3
-        self.enemy_direction = 1
-        
-    def update(self):
-        # Update enemy ship position
-        if self.image_rect.left <= 0 or self.image_rect.right >= SCREEN_WIDTH:
-            self.enemy_direction *= -1  # Reverse direction if it reaches the lateral limits.
-        self.image_rect.x += self.enemy_direction * self.spaceship_enemy_speed
 
 

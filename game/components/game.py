@@ -2,7 +2,9 @@ import pygame
 
 from game.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, DEFAULT_TYPE
 
-from game.components.spaceship import SpaceShip, Enemy
+from game.components.spaceship import SpaceShip
+from game.components.enemy_spaceship import Enemy
+from game.components.bullet import Bullet, bullets
 
 
 
@@ -24,6 +26,9 @@ class Game:
         self.spaceship = SpaceShip()
         #Game has a enemy 
         self.enemy = Enemy(500, 50)
+        # bullet of the spaceship
+        #self.bullet = Bullet(self.spaceship.image_rect.centerx, self.spaceship.image_rect.y )
+        
 
     def run(self):
         # Game loop: events - update - draw
@@ -57,6 +62,9 @@ class Game:
                     self.spaceship.move_up = True
                 elif event.key == pygame.K_DOWN:  # Nueva tecla agregada: flecha hacia abajo
                     self.spaceship.move_down = True
+                elif event.key == pygame.K_x:
+                    bullet = Bullet(self.spaceship.image_rect.centerx, self.spaceship.image_rect.y)
+                    bullets.append(bullet)
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
                     self.spaceship.move_left = False
@@ -71,18 +79,39 @@ class Game:
     def update(self):
         # pass
         self.spaceship.update()
+        
+
+        for bullet in bullets:
+            bullet.update()
+            if bullet.image_rect.bottom <= 0: 
+                bullets.remove(bullet)
+        
+        for bullet in bullets:
+            if self.enemy.image_rect is not None and bullet.image_rect.colliderect(self.enemy.image_rect):
+                bullets.remove(bullet)
+                self.enemy.image_rect = None
+
         self.enemy.update()
+        
+
 
     def draw(self):
         self.clock.tick(FPS)
         self.screen.fill((255, 255, 255))
         self.draw_background()
+        
 
 
         # dibujamos el objeto en pantalla
         self.screen.blit(self.spaceship.image, (self.spaceship.image_rect.x, self.spaceship.image_rect.y))
         # display the enemy spaceship in its current position 
-        self.screen.blit(self.enemy.image, self.enemy.image_rect)
+        if self.enemy.image_rect is not None:
+            self.screen.blit(self.enemy.image, self.enemy.image_rect)
+        # show the positions of the bullets 
+        for bullet in bullets:
+            self.screen.blit(bullet.image, bullet.image_rect)
+            
+
 
         pygame.display.update()
         pygame.display.flip()
