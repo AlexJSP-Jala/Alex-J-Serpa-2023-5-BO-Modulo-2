@@ -43,9 +43,12 @@ class Game:
         #Color
         self.WHITE = (255, 255, 255)
         self.RED = (255, 0, 0)
+        self.GREEN = (0, 255, 0)
         self.game_over_text = None
         self.restart_text = None
         self.deaths_text = None 
+        self.bullet_count = None
+        self.score_text = None
         self.restart = False
 
     def run(self):
@@ -54,12 +57,13 @@ class Game:
 
         # while self.playing == True
         while self.playing: # Mientras el atributo playing (self.playing) sea true "repito"
+            if self.spaceship.image_rect is None:
+                self.game_over = True
             
             self.handle_events()
             self.update()
             self.draw()
-            if self.game_over:
-                self.game_over_screen()
+            
             #pygame.display.update()
             
             #self.game_over(self.game_over_status)
@@ -98,6 +102,7 @@ class Game:
                 if event.key == pygame.K_r:
                     self.restart = True
                     self.game_over = False
+                    #self.restart_game()
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
                     self.spaceship.move_left = False
@@ -118,11 +123,10 @@ class Game:
         self.bullet_spaceship.shoot_eliminate(self.enemy_2, self.spaceship.bullets, 10, 1)
         self.shoots_enemys(self.enemy)
         self.bullet_enemy.shoot_eliminate(self.spaceship, self.enemy.bullets, -20, 5)
+        print("Esto es hola")
         
-        #if self.spaceship.image_rect is None:
-        #    self.game_over = True
 
-        print("esto es la variable game", self.game_over)
+        #print("esto es la variable game", self.game_over)
         
         
     def shoots_enemys(self, variable_enemy):
@@ -136,33 +140,20 @@ class Game:
             #print("Continue")
             pass
     
-
-        """ for bullet in bullets:
-            bullet.update()
-            if bullet.image_rect.top <= 0: 
-                bullets.remove(bullet)
-        
-        for bullet in bullets:
-            if self.enemy.image_rect is not None and bullet.image_rect.colliderect(self.enemy.image_rect):
-                bullets.remove(bullet)
-                self.enemy.image_rect = None
-            elif self.enemy_2.image_rect is not None and bullet.image_rect.colliderect(self.enemy_2.image_rect):
-                bullets.remove(bullet)
-                self.enemy_2.image_rect = None """
         
     def game_over_screen(self):
-        
-        self.game_over_text = self.font.render("Game Over", True, self.RED)
-        self.restart_text = self.font.render("Presiona 'R' para reiniciar", True, self.RED)
-        self.deaths_text = self.font.render("Death Count: " + str(self.deaths), True, self.RED)
+
+        self.game_over_text = self.font.render("Game Over", True, self.GREEN)
+        self.restart_text = self.font.render("Presiona 'R' para reiniciar", True, self.GREEN)
+        self.deaths_text = self.font.render("Death Count: " + str(self.bullet_enemy.deaths), True, self.GREEN)
+        self.bullet_count = self.font.render("Bullet Count: " + str(self.bullet_enemy.impact), True, self.GREEN)
         self.screen.fill(self.WHITE)
         self.screen.blit(self.game_over_text, (SCREEN_WIDTH // 2 - self.game_over_text.get_width() // 2, 200))
         self.screen.blit(self.restart_text, (SCREEN_WIDTH // 2 - self.restart_text.get_width() // 2, 250))
         self.screen.blit(self.deaths_text, (SCREEN_WIDTH // 2 - self.deaths_text.get_width() // 2, 300))
-        pygame.display.flip()
-        
-            
-        
+        self.screen.blit(self.bullet_count, (SCREEN_WIDTH // 2 - self.deaths_text.get_width() // 2, 350))
+
+
     
     def restart_game(self):
         self.restart = False
@@ -198,6 +189,11 @@ class Game:
         for bullet in self.enemy.bullets:
             self.screen.blit(bullet.image, bullet.image_rect)
         
+        if self.game_over:
+                self.game_over_screen()
+                self.game_over = False
+                pygame.display.flip()
+        
         
             
         pygame.display.update()
@@ -208,6 +204,7 @@ class Game:
         image_height = image.get_height()
         self.screen.blit(image, (self.x_pos_bg, self.y_pos_bg))
         self.screen.blit(image, (self.x_pos_bg, self.y_pos_bg - image_height))
+        score_text = self.font.render("Score: " + str(self.bullet_enemy.impact), True, self.RED)
         if self.y_pos_bg >= SCREEN_HEIGHT:
             self.screen.blit(image, (self.x_pos_bg, self.y_pos_bg - image_height))
             self.y_pos_bg = 0

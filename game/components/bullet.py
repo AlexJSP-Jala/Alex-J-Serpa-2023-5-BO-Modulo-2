@@ -18,6 +18,7 @@ class Bullet(Sprite):
         self.image_rect.bottom = y_position
         self.impact = 0
         self.deaths = 0
+        
         #self.global_game_over = False
         
         
@@ -37,7 +38,10 @@ class Bullet(Sprite):
                 self.impact += 1
                 if self.impact>= bullet_lethality:
                     self.deaths += 1
-                    enemy.image_rect = None  
+                    enemy.image_rect = None
+                    
+       
+                    
                     
                     
                     
