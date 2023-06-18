@@ -3,9 +3,6 @@ from pygame.sprite import Sprite
 from game.utils.constants import  SCREEN_HEIGHT
 
 
-
-#bullets = []
-
 class Bullet(Sprite):
     
     def __init__(self,x_position_center, y_position, image_bullet):
@@ -19,26 +16,15 @@ class Bullet(Sprite):
         self.impact = 0
         self.deaths = 0
         
-        #self.global_game_over = False
-        
-        
-        #self.bullet_speed = 10
-
-    def update(self, speed_bullet):
-        self.image_rect.y -= speed_bullet
     
-    def shoot_eliminate(self, enemy, bullets, speed_bullet, bullet_lethality):
+    def update_bullet(self, bullets, speed_bullet):
         for bullet in bullets:
-            bullet.update(speed_bullet)
+            #bullet.update(speed_bullet)
+            bullet.image_rect.y -= speed_bullet
             if bullet.image_rect.top <= 0 or bullet.image_rect.bottom >= SCREEN_HEIGHT: 
                 bullets.remove(bullet)
 
-            if enemy.image_rect is not None and bullet.image_rect.colliderect(enemy.image_rect):
-                bullets.remove(bullet)
-                self.impact += 1
-                if self.impact>= bullet_lethality:
-                    self.deaths += 1
-                    enemy.image_rect = None
+            
                     
        
                     

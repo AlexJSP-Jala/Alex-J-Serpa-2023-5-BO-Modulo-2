@@ -48,15 +48,7 @@ class SpaceShip(Sprite):
         self.bullet = Bullet(x_position_center, y_position, BULLET)
         self.bullets.append(self.bullet)
 
-    def reset(self):
-        if self.image_rect is not None:
-            self.image_rect.x = 40
-            self.image_rect.y = 500
-            self.move_left = False
-            self.move_right = False
-            self.move_down = False
-            self.move_up = False
-            self.bullets.clear()
+    
 
 
 

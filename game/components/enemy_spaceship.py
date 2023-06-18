@@ -17,7 +17,7 @@ class Enemy(Sprite):
         self.move_left = False
         self.move_right = False
         # Enemy ship movement configuration
-        self.spaceship_enemy_speed = 10
+        self.spaceship_enemy_speed = 5
         self.enemy_direction = 1
         self.bullets = []
         
