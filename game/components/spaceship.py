@@ -1,7 +1,7 @@
 import pygame
 from pygame.sprite import Sprite
 
-from game.utils.constants import SPACESHIP, SCREEN_WIDTH, SCREEN_HEIGHT, BULLET
+from game.utils.constants import SPACESHIP, SCREEN_WIDTH, SCREEN_HEIGHT, BULLET, SPACESHIP_SHIELD
 from game.components.bullet import Bullet
 
 # casi Todo en pygame es un objeto
@@ -17,6 +17,7 @@ class SpaceShip(Sprite):
     
     def __init__(self):
         self.image_size = (40, 60)
+        self.image_size_with_shield = (60, 60)
         self.image = pygame.transform.scale(SPACESHIP, self.image_size)
         self.image_rect = self.image.get_rect()
         self.image_rect.x = 40
@@ -27,6 +28,7 @@ class SpaceShip(Sprite):
         self.move_down = False
         self.move_up = False
         self.bullets = []
+        self.has_shield = False
         
 
     def update(self):
@@ -47,6 +49,14 @@ class SpaceShip(Sprite):
     def shoot(self, x_position_center, y_position):
         self.bullet = Bullet(x_position_center, y_position, BULLET)
         self.bullets.append(self.bullet)
+    
+    def activate_shield(self):
+        self.image = pygame.transform.scale(SPACESHIP_SHIELD, self.image_size_with_shield)
+        self.has_shield = True
+    
+    def deactivate_shield(self):
+        self.image = pygame.transform.scale(SPACESHIP, self.image_size)  
+        self.has_shield = False
 
     
 

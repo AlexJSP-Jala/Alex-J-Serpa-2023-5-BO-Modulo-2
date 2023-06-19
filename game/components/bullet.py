@@ -19,21 +19,9 @@ class Bullet(Sprite):
     
     def update_bullet(self, bullets, speed_bullet):
         for bullet in bullets:
-            #bullet.update(speed_bullet)
             bullet.image_rect.y -= speed_bullet
             if bullet.image_rect.top <= 0 or bullet.image_rect.bottom >= SCREEN_HEIGHT: 
                 bullets.remove(bullet)
-
-            
-                    
-       
-                    
-                    
-                    
-                    
-            
-
-    
 
 
 
