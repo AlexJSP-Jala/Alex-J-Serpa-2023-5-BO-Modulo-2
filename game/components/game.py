@@ -17,6 +17,7 @@ from game.components.shield import Shield_spaceship
 class Game:
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()
         pygame.display.set_caption(TITLE)
         pygame.display.set_icon(ICON)
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -32,7 +33,8 @@ class Game:
         #Game has a enemy 
         self.enemys = [Enemy(500, 50, ENEMY_1), Enemy(400, 50, ENEMY_1), 
                         Enemy(300, 50,ENEMY_1), Enemy(200, 50, ENEMY_1), Enemy(100, 50, ENEMY_1), 
-                        Enemy(100, 150, ENEMY_2)]
+                        Enemy(100, 150, ENEMY_2), Enemy(200, 150, ENEMY_2), Enemy(300, 150, ENEMY_2),
+                        Enemy(400, 150, ENEMY_2), Enemy(500, 150, ENEMY_2)]
         self.enemy_gift = 0
         # bullet of the spaceship
         self.bullet_spaceship = Bullet(self.spaceship.image_rect.centerx, self.spaceship.image_rect.y, BULLET)
@@ -46,8 +48,10 @@ class Game:
         self.game_over = None
         self.deaths = 0
         self.impacts = 0
+        self.score = 0
         # Text font
-        self.font = pygame.font.Font(None, 60)
+        self.font = pygame.font.SysFont("Algerian", 60)
+        self.font_score = pygame.font.Font(None, 30)
         #Color
         self.WHITE = (255, 255, 255)
         self.RED = (255, 0, 0)
@@ -63,6 +67,8 @@ class Game:
         #powers
         self.list_power_up = []
         self.shiel_protection = 0
+        #sound
+        #self.SOUND_SHOOT = pygame.mixer.Sound("Other\laser5.ogg")
         
 
     def run(self):
@@ -101,6 +107,7 @@ class Game:
                     self.spaceship.move_down = True
                 elif event.key == pygame.K_x and self.spaceship.image_rect is not None:
                     self.spaceship.shoot(self.spaceship.image_rect.centerx, self.spaceship.image_rect.y)
+                    #self.SOUND_SHOOT.play()
                 elif event.key == pygame.K_r:
                     if self.game_over:
                         self.restart_game()
@@ -135,6 +142,7 @@ class Game:
             power.update()
             if self.spaceship.image_rect is not None and self.spaceship.image_rect.colliderect(power.shield_image_rect):
                 if not self.spaceship.has_shield:  
+                    self.list_power_up.remove(power)
                     self.spaceship.activate_shield()
                     self.shiel_protection = 5  
 
@@ -142,7 +150,7 @@ class Game:
         for bullet in bullets:
             if spaceship.image_rect is not None and bullet.image_rect.colliderect(spaceship.image_rect):
                 bullets.remove(bullet)
-                if self.shiel_protection > 0: 
+                if self.shiel_protection >= 0: 
                     self.shiel_protection -= 1
                     print("shiel protection", self.shiel_protection)
                 if self.shiel_protection <= 0:
@@ -158,6 +166,7 @@ class Game:
             for enemy in enemys:
                 if enemy.image_rect is not None and bullet.image_rect.colliderect(enemy.image_rect):
                     power_up = Power_up(bullet.image_rect.centerx, bullet.image_rect.centery, SHIELD)
+                    self.score += 1 
                     if self.spaceship.has_shield:
                         bullets.remove(bullet)
                         enemy.image_rect = None
@@ -168,12 +177,12 @@ class Game:
                 
     def shoots_enemys(self, variable_enemy):
         self.enemy_firing_frequency = random.randint(0, 100)
-        if variable_enemy.image_rect is not None and self.enemy_firing_frequency < 2:
+        if variable_enemy.image_rect is not None and self.enemy_firing_frequency < 1:
             variable_enemy.shoot(variable_enemy.image_rect.centerx, variable_enemy.image_rect.bottom)
 
     def game_over_screen(self):
-        self.game_over_text = self.font.render("Game Over", True, self.WHITE)
-        self.restart_text = self.font.render("Presiona 'R' para reiniciar", True, self.WHITE)
+        self.game_over_text = self.font.render("GAME OVER", True, self.YELLOW)
+        self.restart_text = self.font.render("Presiona 'R' para reiniciar", True, self.YELLOW)
         self.deaths_text = self.font.render("Death Count: " + str(self.deaths), True, self.RED)
         self.bullet_count = self.font.render("Bullet Count: " + str(self.impacts), True, self.BLACK)
         #self.screen.fill(self.WHITE)
@@ -190,7 +199,8 @@ class Game:
         self.spaceship = SpaceShip()
         self.enemys = [Enemy(500, 50, ENEMY_1), Enemy(400, 50, ENEMY_1), 
                         Enemy(300, 50,ENEMY_1), Enemy(200, 50, ENEMY_1), Enemy(100, 50, ENEMY_1), 
-                        Enemy(100, 150, ENEMY_2)]
+                        Enemy(100, 150, ENEMY_2), Enemy(200, 150, ENEMY_2), Enemy(300, 150, ENEMY_2),
+                        Enemy(400, 150, ENEMY_2), Enemy(500, 150, ENEMY_2)]
         self.bullet_spaceship = Bullet(self.spaceship.image_rect.centerx, self.spaceship.image_rect.y, BULLET)
         self.enemy_bullets = []
         for enemy_iter in range(len(self.enemys)):
@@ -225,7 +235,12 @@ class Game:
 
         if self.game_over:
             self.game_over_screen()
-    
+
+        count_text = self.font_score.render("Count: " + str(self.impacts), True, self.RED)
+        score_text = self.font_score.render("Score: " + str(self.score*100), True, self.GREEN)
+        self.screen.blit(count_text, (10, 10))
+        self.screen.blit(score_text, (10, 30))
+
         pygame.display.update()
         pygame.display.flip()
 
