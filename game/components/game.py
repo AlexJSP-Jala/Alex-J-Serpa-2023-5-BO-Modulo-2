@@ -2,16 +2,12 @@ import pygame
 import random
 import sys
 
-from game.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, BULLET, BULLET_ENEMY, ENEMY_1, ENEMY_2, SHIELD, SPACESHIP_SHIELD, SPACESHIP
+from game.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, BULLET, BULLET_ENEMY, ENEMY_1, ENEMY_2
 from game.utils.constants import GAME_OVER
 from game.components.spaceship import SpaceShip
 from game.components.enemy_spaceship import Enemy
 from game.components.bullet import Bullet
-from game.components.power_up import Power_up
 from game.components.shield import Shield_spaceship
-
-
-
 
 # Game tiene un "Spaceship" - Por lo general esto es iniciliazar un objeto Spaceship en el __init__
 class Game:
@@ -46,14 +42,10 @@ class Game:
         self.enemy_firing_frequency = None
         #variables Game Over
         self.game_over = None
-        self.deaths = 0
-        self.impacts = 0
-        self.score = 0
         # Text font
         self.font = pygame.font.SysFont("Algerian", 60)
         self.font_score = pygame.font.Font(None, 30)
         #Color
-        self.WHITE = (255, 255, 255)
         self.RED = (255, 0, 0)
         self.GREEN = (0, 255, 0)
         self.BLACK = (0, 0, 0)
@@ -64,9 +56,6 @@ class Game:
         self.bullet_count = None
         self.score_text = None
         self.restart = False
-        #powers
-        self.list_power_up = []
-        self.shiel_protection = 0
         #sound
         #self.SOUND_SHOOT = pygame.mixer.Sound("Other\laser5.ogg")
         
@@ -125,55 +114,25 @@ class Game:
 
     def update(self):
         # pass
-        
         self.shield_spaceship.update()
         self.spaceship.update()
         self.bullet_spaceship.update_bullet(self.spaceship.bullets,10)
         for iter_enemys in range(len(self.enemys)):
             self.shoots_enemys(self.enemys[iter_enemys])
             self.enemy_bullets[iter_enemys].update_bullet(self.enemys[iter_enemys].bullets, -20)
-            self.detect_impact_bullet(self.enemys[iter_enemys].bullets, self.spaceship, 5)
+            self.spaceship.detect_impact_bullet(self.enemys[iter_enemys].bullets, self.spaceship, 5)
 
         for enemy in self.enemys:
             enemy.update()
 
-        self.delete_enemys(self.spaceship.bullets, self.enemys)
-        for power in self.list_power_up:
+        self.spaceship.delete_enemys(self.spaceship.bullets, self.enemys)
+        for power in self.spaceship.list_power_up:
             power.update()
             if self.spaceship.image_rect is not None and self.spaceship.image_rect.colliderect(power.shield_image_rect):
                 if not self.spaceship.has_shield:  
-                    self.list_power_up.remove(power)
+                    self.spaceship.list_power_up.remove(power)
                     self.spaceship.activate_shield()
-                    self.shiel_protection = 5  
 
-    def detect_impact_bullet(self, bullets, spaceship, bullet_lethality):
-        for bullet in bullets:
-            if spaceship.image_rect is not None and bullet.image_rect.colliderect(spaceship.image_rect):
-                bullets.remove(bullet)
-                if self.shiel_protection >= 0: 
-                    self.shiel_protection -= 1
-                    print("shiel protection", self.shiel_protection)
-                if self.shiel_protection <= 0:
-                    self.spaceship.deactivate_shield()
-                    self.impacts += 1
-                    if self.impacts>= bullet_lethality:
-                        self.deaths += 1
-                        spaceship.image_rect = None
-                print("this is the impact of the SpaceShip", self.impacts)
-
-    def delete_enemys(self, bullets, enemys):
-        for bullet in bullets:
-            for enemy in enemys:
-                if enemy.image_rect is not None and bullet.image_rect.colliderect(enemy.image_rect):
-                    power_up = Power_up(bullet.image_rect.centerx, bullet.image_rect.centery, SHIELD)
-                    self.score += 1 
-                    if self.spaceship.has_shield:
-                        bullets.remove(bullet)
-                        enemy.image_rect = None
-                    else:
-                        self.list_power_up.append(power_up)
-                        bullets.remove(bullet)
-                        enemy.image_rect = None
                 
     def shoots_enemys(self, variable_enemy):
         self.enemy_firing_frequency = random.randint(0, 100)
@@ -183,8 +142,8 @@ class Game:
     def game_over_screen(self):
         self.game_over_text = self.font.render("GAME OVER", True, self.YELLOW)
         self.restart_text = self.font.render("Presiona 'R' para reiniciar", True, self.YELLOW)
-        self.deaths_text = self.font.render("Death Count: " + str(self.deaths), True, self.RED)
-        self.bullet_count = self.font.render("Bullet Count: " + str(self.impacts), True, self.BLACK)
+        self.deaths_text = self.font.render("Death Count: " + str(self.spaceship.deaths), True, self.RED)
+        self.bullet_count = self.font.render("Bullet Count: " + str(self.spaceship.impacts), True, self.BLACK)
         #self.screen.fill(self.WHITE)
         self.screen.blit(GAME_OVER, (0, 0))
         self.screen.blit(self.game_over_text, (SCREEN_WIDTH // 2 - self.game_over_text.get_width() // 2, 200))
@@ -214,21 +173,16 @@ class Game:
         # dibujamos el objeto en pantalla
         if self.spaceship.image_rect is not None:
             self.screen.blit(self.spaceship.image, (self.spaceship.image_rect.x, self.spaceship.image_rect.y))
-            #self.screen.blit(self.shield_spaceship.image, (self.shield_spaceship.image_rect.x, self.shield_spaceship.image_rect.y))
-
         # display the enemy spaceship in its current position
         for iter_enemys in range(len(self.enemys)): 
             if self.enemys[iter_enemys].image_rect is not None:
                 self.screen.blit(self.enemys[iter_enemys].image, self.enemys[iter_enemys].image_rect)
-            
             # show the positions of the enemy bullets
             for bullet in self.enemys[iter_enemys].bullets:
                 self.screen.blit(bullet.image, bullet.image_rect)
-        
         #enemy gift
-        for powers in self.list_power_up:
+        for powers in self.spaceship.list_power_up:
             self.screen.blit(powers.shield_image, powers.shield_image_rect)
-
         # show the positions of the spaceship bullets 
         for bullet in self.spaceship.bullets:
             self.screen.blit(bullet.image, bullet.image_rect)
@@ -236,8 +190,8 @@ class Game:
         if self.game_over:
             self.game_over_screen()
 
-        count_text = self.font_score.render("Count: " + str(self.impacts), True, self.RED)
-        score_text = self.font_score.render("Score: " + str(self.score*100), True, self.GREEN)
+        count_text = self.font_score.render("Count: " + str(self.spaceship.impacts), True, self.RED)
+        score_text = self.font_score.render("Score: " + str(self.spaceship.score*100), True, self.GREEN)
         self.screen.blit(count_text, (10, 10))
         self.screen.blit(score_text, (10, 30))
 

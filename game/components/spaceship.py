@@ -1,13 +1,13 @@
 import pygame
 from pygame.sprite import Sprite
 
-from game.utils.constants import SPACESHIP, SCREEN_WIDTH, SCREEN_HEIGHT, BULLET, SPACESHIP_SHIELD
+from game.utils.constants import SPACESHIP, SCREEN_WIDTH, SCREEN_HEIGHT, BULLET, SPACESHIP_SHIELD, SHIELD
 from game.components.bullet import Bullet
+from game.components.power_up import Power_up
 
 # casi Todo en pygame es un objeto
 # Un personaje en mi juego es un objeto (instancia de algo)
 # La nave (spaceship) es un personaje => necesito una clase
-
 
 
 # SpaceShip es una clase derivada (hija) de Sprite
@@ -29,6 +29,11 @@ class SpaceShip(Sprite):
         self.move_up = False
         self.bullets = []
         self.has_shield = False
+        self.shiel_protection = 0
+        self.impacts = 0
+        self.deaths = 0
+        self.score = 0
+        self.list_power_up = []
         
 
     def update(self):
@@ -53,10 +58,40 @@ class SpaceShip(Sprite):
     def activate_shield(self):
         self.image = pygame.transform.scale(SPACESHIP_SHIELD, self.image_size_with_shield)
         self.has_shield = True
+        self.shiel_protection = 5 
     
     def deactivate_shield(self):
         self.image = pygame.transform.scale(SPACESHIP, self.image_size)  
         self.has_shield = False
+
+    def detect_impact_bullet(self, bullets, spaceship, bullet_lethality):
+        for bullet in bullets:
+            if spaceship.image_rect is not None and bullet.image_rect.colliderect(spaceship.image_rect):
+                bullets.remove(bullet)
+                if self.shiel_protection >= 0: 
+                    self.shiel_protection -= 1
+                    print("shiel protection", self.shiel_protection)
+                if self.shiel_protection <= 0:
+                    self.deactivate_shield()
+                    self.impacts += 1
+                    if self.impacts>= bullet_lethality:
+                        self.deaths += 1
+                        spaceship.image_rect = None
+                print("this is the impact of the SpaceShip", self.impacts)
+    
+    def delete_enemys(self, bullets, enemys):
+        for bullet in bullets:
+            for enemy in enemys:
+                if enemy.image_rect is not None and bullet.image_rect.colliderect(enemy.image_rect):
+                    power_up = Power_up(bullet.image_rect.centerx, bullet.image_rect.centery, SHIELD)
+                    self.score += 1 
+                    if self.has_shield:
+                        bullets.remove(bullet)
+                        enemy.image_rect = None
+                    else:
+                        self.list_power_up.append(power_up)
+                        bullets.remove(bullet)
+                        enemy.image_rect = None
 
     
 

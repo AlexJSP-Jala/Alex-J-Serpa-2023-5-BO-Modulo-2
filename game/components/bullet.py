@@ -23,5 +23,6 @@ class Bullet(Sprite):
             if bullet.image_rect.top <= 0 or bullet.image_rect.bottom >= SCREEN_HEIGHT: 
                 bullets.remove(bullet)
 
+    
 
 
